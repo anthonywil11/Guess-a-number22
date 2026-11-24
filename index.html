@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess The Number | JS Challenge 03</title>
+  <style>
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f8f7fc;
+  --card: #ffffff;
+  --surface: #f4f1ff;
+  --text: #29263d;
+  --muted: #77758c;
+  --border: #e9e5f2;
+  --primary: #8270d8;
+  --lavender: #ddd6fe;
+  --blue: #dbeafe;
+  --mint: #d7f5e4;
+  --coral: #ffe0dc;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 10% 10%, #eee8ff, transparent 35%),
+    radial-gradient(circle at 90% 90%, #e4f3ff, transparent 35%),
+    var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* TARJETA */
+
+.game-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 18px 55px rgba(80, 70, 130, .07);
+}
+
+/* ENCABEZADO */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.6px;
+}
+
+.badge {
+  padding: 7px 12px;
+  background: var(--surface);
+  color: #7461b8;
+  border-radius: 30px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* NÚMERO SECRETO */
+
+.number-display {
+  padding: 28px 20px;
+  margin-bottom: 26px;
+  background: #f5f2ff;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.question-mark {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 15px;
+  background: var(--lavender);
+  color: #7160bf;
+  border-radius: 20px;
+  font-size: 38px;
+  font-weight: 800;
+}
+
+.number-display h2 {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+.number-display p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* INTENTOS */
+
+.attempts-section {
+  margin-bottom: 26px;
+}
+
+.attempts-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.attempts-header span {
+  color: var(--muted);
+}
+
+.attempts-header strong {
+  color: #7461b8;
+}
+
+.progress-bar {
+  height: 9px;
+  background: #eeebf6;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #a89be8;
+  border-radius: inherit;
+  transition: width .3s ease;
+}
+
+/* FORMULARIO */
+
+.guess-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guess-form label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.guess-form input {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fcfbff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.guess-form input::placeholder {
+  color: #a5a0b5;
+}
+
+.guess-form input:focus {
+  border-color: #a89be8;
+}
+
+/* BOTONES */
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+#check-btn {
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#check-btn:hover {
+  background: #7060c1;
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* MENSAJES */
+
+.feedback {
+  margin: 22px 0;
+  padding: 15px;
+  background: #eff5ff;
+  color: #4d6895;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.feedback.success {
+  background: var(--mint);
+  color: #256849;
+}
+
+.feedback.error {
+  background: var(--coral);
+  color: #a34651;
+}
+
+/* HISTORIAL */
+
+.history-section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 45px;
+  list-style: none;
+}
+
+.history-list li {
+  padding: 10px 14px;
+  background: var(--blue);
+  color: #365f8d;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.history-list .empty-history {
+  background: transparent;
+  color: var(--muted);
+  padding-left: 0;
+  font-weight: 400;
+}
+
+/* REINICIAR */
+
+.restart-btn {
+  width: 100%;
+  margin-top: 22px;
+  padding: 14px;
+  background: #f4f1ff;
+  border: 1px solid #e5defb;
+  border-radius: 12px;
+  color: #7461b8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.restart-btn:hover {
+  background: #e9e2ff;
+}
+
+footer {
+  margin-top: 24px;
+  color: #a09caf;
+  text-align: center;
+  font-size: 11px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+  body {
+    padding: 16px;
+  }
+
+  .game-card {
+    padding: 22px;
+  }
+
+  .header h1 {
+    font-size: 17px;
+  }
+
+  .badge {
+    font-size: 9px;
+  }
+
+  .number-display h2 {
+    font-size: 34px;
+  }
+}
+
+  </style>
+  
+</head>
+<body>
+
+  <main class="game-card">
+
+    <header class="header">
+      <h1>Guess The Number</h1>
+      <span class="badge">JS Challenge 03</span>
+    </header>
+
+    <section class="number-display">
+      <div class="question-mark">?</div>
+      <h2>1 — 100</h2>
+      <p>Estoy pensando en un número...</p>
+    </section>
+
+    <section class="attempts-section">
+      <div class="attempts-header">
+        <span>Intentos restantes</span>
+        <strong id="attempts-left">7 / 7</strong>
+      </div>
+
+      <div id="progress-bar" class="progress-bar">
+        <span></span>
+      </div>
+    </section>
+
+    <form id="guess-form" class="guess-form">
+      <label for="guess-input">Tu respuesta</label>
+
+      <input
+        id="guess-input"
+        type="number"
+        placeholder="Número del 1 al 100"
+        min="1"
+        max="100"
+        step="1"
+        autocomplete="off"
+      >
+
+      <button id="check-btn" type="submit">
+        Comprobar número
+      </button>
+    </form>
+
+    <div id="feedback" class="feedback">
+      Introduce un número para comenzar.
+    </div>
+
+    <section class="history-section">
+      <h3>Historial de intentos</h3>
+
+      <ul id="history-list" class="history-list">
+        <li class="empty-history">
+          Todavía no has intentado ningún número.
+        </li>
+      </ul>
+    </section>
+
+    <button id="restart-btn" class="restart-btn">
+      ↻ Nueva partida
+    </button>
+
+    <footer>
+      Made with HTML, CSS & JavaScript
+    </footer>
+
+  </main>
+
+  <script>
+
+const attempts = document.getElementById("attempts-left");
+const progressBar = document.querySelector(".progress-bar span");
+const guessInput = document.getElementById("guess-input");
+const checkButton = document.getElementById("check-btn");
+const feedbackMessage = document.getElementById("feedback");
+const historyList = document.getElementById("history-list");
+const resetButton = document.getElementById("restart-btn");
+
+
+const maxAttempts = 7;
+let leftAttempts = 7;
+const maxNumber = 100;
+const minNumber = 1;
+ let randomNumber = Math.floor(Math.random() * 100) + 1;
+let myNumero = 0;
+
+let history = [];
+
+
+checkButton.addEventListener("click", (e) => {
+  e.preventDefault();
+   myNumero = guessInput.value.trim();
+  validarNumero(myNumero);
+  cargarHistory()
+
+})
+
+
+
+
+function validarNumero(numero) {
+
+    if (numero === "") {
+          feedbackMessage.textContent = "El campo esta vacio";
+    } else {
+      numero = Number(numero)
+    }  
+
+    if (!Number.isInteger(numero)) {
+      feedbackMessage.textContent = "Numeros Enteros";
+
+      return
+    }  
+
+
+  if (numero > maxNumber || numero < minNumber) {
+    feedbackMessage.textContent = "Introduce Un Numero dentro del 1 al 100";
+    return
+  } else if (!numero) {
+
+  }
+
+
+  validarIntentos()
+  history.push(numero);
+
+  if (numero > randomNumber) {
+    feedbackMessage.textContent = "Mi numero Es Menor";
+  } else if (numero < randomNumber) {
+    feedbackMessage.textContent = "Mi numero Es Mayor";
+  } else if (numero == randomNumber) {
+    feedbackMessage.textContent = "Felicidades Encontraste Mi numero";
+    checkButton.disabled = true;
+  }
+
+
+}
+
+
+function validarIntentos() {
+  if (leftAttempts > 0) {
+    leftAttempts--
+
+    const porcentaje = (leftAttempts / maxAttempts) * 100;
+    attempts.textContent =`${leftAttempts} ${"/"} ${maxAttempts}`
+    progressBar.style.width = `${porcentaje}%`;
+
+  }
+
+  if (leftAttempts == 0) {
+    checkButton.disabled = true;
+          feedbackMessage.textContent = "Mi numero Es Menor";
+  }
+
+}
+
+
+function cargarHistory() {
+
+  historyList.innerHTML = "";
+
+  for (let number of history) {
+    let listItem = document.createElement("li");
+    listItem.textContent = number;
+    historyList.appendChild(listItem)
+  }
+
+}
+
+console.log(randomNumber)
+
+
+
+resetButton.addEventListener("click", () => {
+  resetInformation()
+})
+
+
+function resetInformation() {
+  leftAttempts = 7;
+  history.length = 0;
+  checkButton.disabled = false;
+  historyList.innerHTML = "";
+  let listItem = document.createElement("li");
+  listItem.textContent = "  Todavía no has intentado ningún número.";
+  historyList.appendChild(listItem)
+  progressBar.style.width = "100%";
+  attempts.textContent = `${leftAttempts} ${"/"} ${maxAttempts}`
+  randomNumber = Math.floor(Math.random() * 100) + 1;
+  console.log(randomNumber)
+}
+
+  </script>
+</body>
+</html>
